@@ -22,17 +22,9 @@ def load_model():
 
     class _Args: pass
     model = Wav2Vec2Model(_Args(), device)
-    state_dict = torch.load(weight_path, map_location=device)
 
-    # encoder.0.0.x → encoder.0.x 키 이름 변환
-    new_state_dict = {}
-    for k, v in state_dict.items():
-        # encoder.숫자.0.나머지 → encoder.숫자.나머지
-        import re
-        new_k = re.sub(r'^encoder\.(\d+)\.0\.', r'encoder.\1.', k)
-        new_state_dict[new_k] = v
-
-    model.load_state_dict(new_state_dict)
+    model.load_state_dict(torch.load(weight_path, map_location=device))
+    
     model.eval().to(device)
     return model, device
 
