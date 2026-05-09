@@ -217,7 +217,14 @@ class Wav2Vec2Model(nn.Module):
         w = self.attention(x)
 
         # spectral branch
-        e_S   = torch.sum(x * F.softmax(w, dim=-1), dim=-1).transpose(1,2) + self.pos_S
+        e_S_raw = torch.sum(x * F.softmax(w, dim=-1), dim=-1).transpose(1,2)
+        pos_S = self.pos_S
+        if e_S_raw.size(1) != pos_S.size(1):
+            pos_S = F.interpolate(
+                pos_S.transpose(1,2), size=e_S_raw.size(1), mode='linear', align_corners=False
+            ).transpose(1,2)
+        e_S = e_S_raw + pos_S
+
         out_S = self.pool_S(self.GAT_layer_S(e_S))
 
         # temporal branch
