@@ -11,7 +11,8 @@ REPO_ID    = "eunei/ai-cover-detector-singgraph"
 MODEL_FILE = "best.pth"
 SR_XLSR   = 16000
 SR_MERT   = 24000
-CLIP_SEC  = 4.04
+CUT_XLSR   = 64600                        # 학습 시 사용한 샘플 수
+CUT_MERT   = int(64600 * 24000 / 16000)
 THRESHOLD = 0.5
 
 
@@ -37,8 +38,8 @@ def load_and_clip(file_bytes: bytes):
     wav_16k = torchaudio.transforms.Resample(sr, SR_XLSR)(waveform)
     wav_24k = torchaudio.transforms.Resample(sr, SR_MERT)(waveform)
 
-    clip_16k = int(CLIP_SEC * SR_XLSR)   # 64640
-    clip_24k = int(CLIP_SEC * SR_MERT)   # 96960
+    clip_16k = CUT_XLSR   # 64640
+    clip_24k = CUT_MERT   # 96960
     ratio    = SR_MERT / SR_XLSR         # 1.5
     total    = wav_16k.shape[1]
 
