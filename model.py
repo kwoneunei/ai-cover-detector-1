@@ -54,8 +54,10 @@ class GraphAttentionLayer(nn.Module):
         return self.act(x)
 
     def _pairwise_mul_nodes(self, x):
-        nb = x.size(1)
-        return x.unsqueeze(2).expand(-1, -1, nb, -1) * x.transpose(1, 2).unsqueeze(1).expand(-1, nb, -1, -1)
+        nb_nodes = x.size(1)
+        x_exp = x.unsqueeze(2).expand(-1, -1, nb_nodes, -1)
+        x_mirror = x_exp.transpose(1, 2)
+        return x_exp * x_mirror
 
     def _derive_att_map(self, x):
         a = torch.tanh(self.att_proj(self._pairwise_mul_nodes(x)))
